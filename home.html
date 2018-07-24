@@ -1,0 +1,1072 @@
+<!DOCTYPE HTML>
+<!--
+	Hyperspace by HTML5 UP
+	html5up.net | @dl12
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+	<head>
+		<title>US Permanent VISA Study</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<link rel="stylesheet" href="assets/css/main.css" />
+		<script src="assets/js/d3.v3.js"></script>
+		<script src="assets/js/slider.js"></script>
+
+		<!--<script src="assets/js/d3.min.js"></script>-->
+
+	</head>
+	<body>
+	<script type="text/javascript" src="./assets/js/US_Perm_Visa_Dashboard_Overview.js"></script>
+
+
+	<!-- Sidebar -->
+		<section id="sidebar">
+			<div class="inner">
+				<nav>
+					<ul>
+						<li><a href="#intro">Essay</a></li>
+						<li><a href="#one">Overview</a></li>
+						<li><a href="#two">Trends</a></li>
+						<li><a href="#three">Groups</a></li>
+					</ul>
+				</nav>
+			</div>
+		</section>
+
+	<!-- Wrapper -->
+		<div id="wrapper">
+
+			<!-- Intro -->
+			<section id="intro" class="wrapper style1 fullscreen fade-up">
+				<div class="inner">
+					<h2> Final Project – Create a Narrative Visualization </h2>
+					<h3> Question: Does education level of the US Permanent VISA applicants relate to the visa decisions? </h3>
+					<p>The dataset being used was obtained from the U.S. Department of Labor. It contains information of permanent labor certification applications from 2011 to 2016, including information on employer, position, wage offered, employee education, countries of origin, final decision (case status), etc.
+					<p>
+					This dashboard shows US Permanent VISA application status over the past few years. In the overview slide, it shows the number of applications by different case status from Oct 2011 to Dec 2016. The case status is categorized as Certified, Denied and Withdrawn. For Certified, it includes expired certified applicaitons. The second slide has three charts, which allow the user to dynamically create trend lines based off the button clicks. There are two different trend lines - from 2012 to 2016 and from 2014 to 2016. Lastly, the final chart displays the percentage of case status by employee education. Education level in the dataset includes "High School", "Associate's", "Bachelor's", "Master's", "Doctorate", and "Other". 
+					</p>
+
+
+						<p><h3>Details per the Rubric:</h3></p>
+						<ol>
+							<li> Interactive Slideshow: The project consists of 3 slides.</li>
+							<li> Utilization of Scenes: The first slide presents a time series of each case status. The second slide allows to show regression lines for different time frame. The last slide shows case status by education level and helps to identify if applicant's education level is related to the application decision. </li>
+							<li> Annotations: The second slide has the annotations of each regression created, the final slide has tooltip popups.</li>
+							<li> Parameters: The first and second slides allow the user to change the y axis parameters, and trendline subset</li>
+							<li> Triggers: The triggers in this presentation are all buttons. One set to change parameters, and others to progress through the slideshow, the user can also scroll the mouse wheel to progress through the narration.</li>
+						</ol>
+						</p>
+
+					<ul class="actions">
+						<li><a href="#one" class="button scrolly">Continue</a></li>
+					</ul>
+
+				</div>
+			</section>
+
+			<!-- One -->
+			<section id="one" class="wrapper style3 fade-up">
+				<div class="inner">
+					<p>
+					</p>
+
+						<div id="chart1_container">
+							<div id="chartButtons"></div>
+						</div>
+						<script>
+							var w = 1000;
+							var h = 600;
+							var margin = {
+								top: 60,
+								bottom: 100,
+								left: 80,
+								right: 40
+							};
+
+							var width = w - margin.left - margin.right;
+							var height = h - margin.top - margin.bottom;
+
+
+
+							var categories = [{key:'Certified',value:"Status - Certified"},
+										 {key:'Denied', value:"Status - Denied"},
+										 {key:'Withdrawn', value:"Status - Withdrawn"}]
+
+							var svg = d3.select("#chart1_container")
+								.append("svg")
+									.attr("id", "line_chart")
+									.attr("width", w)
+									.attr("height", h);
+
+							var line_chart = svg.append("g")
+									.classed("chart", true)
+									.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+
+							var dateParser = d3.time.format("%m/%Y").parse;
+
+							var x = d3.time.scale()
+								.domain(d3.extent(data, function(d){
+									var date = dateParser(d.date);
+									return date;
+								}))
+								.range([0,width]);
+							var y0 = d3.scale.linear()
+								.domain([d3.min(data, function(d){return d.Certified - 5;}), d3.max(data, function(d){return d.Certified + 5;
+								})])
+								.range([height,0]);
+							var y1 = d3.scale.linear()
+								.domain([d3.min(data, function(d){return d.Denied - 1;}), d3.max(data, function(d){return d.Denied + 1;
+								})])
+								.range([height,0]);
+							var y2 = d3.scale.linear()
+								.domain([d3.min(data, function(d){return d.Withdrawn - 1;}), d3.max(data, function(d){return d.Withdrawn + 1;
+								})])
+								.range([height,0]);
+
+
+							d3.select("chart1_container").append("br");
+
+						var CertifiedButton = d3.select("#chartButtons")
+						  .append("button")
+							.attr("class", "button")
+							.attr("type", "button")
+							.attr("value", "Status - Certified")
+							.attr("id", "Certified")
+							.style("font-size", "8")
+							.text("Status - Certified (incl. Certified Expired)")
+							.on("click", function(d){
+								//d3.select(this).style("background-color", "#434343")
+								plot(data, line_chart, "0",true)
+								});
+
+						var DeniedButton = d3.select("#chartButtons")
+						  .append("button")
+							.attr("class", "button")
+							.attr("type", "button")
+							.attr("value", "Status - Denied")
+							.attr("id", "Denied")
+							.style("font-size", "8")
+							.text("Status - Denied")
+							.on("click", function(d){
+								//d3.select(this).style("background-color", "#434343")
+								plot(data, line_chart, "1", true)
+								});
+
+						var WithdrawnButton = d3.select("#chartButtons")
+						  .append("button")
+							.attr("class", "button")
+							.attr("type", "button")
+							.attr("value", "Status - Withdrawn")
+							.attr("id", "Withdrawn")
+							.style("font-size", "8")
+							.text("Status - Withdrawn")
+							.on("click", function(d){
+								plot(data, line_chart, "2", true)
+								});
+
+
+						var BlankButton = d3.select("#chartButtons")
+						  .append("button")
+							.attr("class", "button")
+							.attr("type", "button")
+							.attr("id", "blank")
+							.style("visibility", "hidden")
+							.text("")
+							.on("click", function(d){
+								plot(data, line_chart, "0", false)
+								});
+
+						//console.log(data)
+						function plot(params, chart, index, redraw){
+							var data = []
+							//console.log(axis_List)
+							var key = categories[index].key
+							//console.log(key)
+
+							params.forEach(function(element){
+								//console.log(element["date"], element[key])
+								data.push([element["date"], element[key]])
+							})
+							//console.log(data)
+
+							var axis_List = [y0,y1,y2];
+							var color_List = []
+							var xAxis = d3.svg.axis()
+										.scale(x)
+										.orient("bottom")
+										.ticks(d3.time.months,24)
+										.tickFormat(d3.time.format("%Y"));
+							var yAxis = d3.svg.axis()
+										.scale(axis_List[index])
+										.orient("left")
+										.ticks(15);
+							var yGridlines = d3.svg.axis()
+											.scale(axis_List[index])
+											.tickSize(-width,0,0)
+											.tickFormat("")
+											.ticks(15)
+											.orient("left");
+							var xGridlines = d3.svg.axis()
+											.scale(x)
+											.tickSize(-height,0,0)
+											.tickFormat("")
+											.ticks(d3.time.months,24);
+
+							//gridlines
+							chart.append("g")
+								.classed("gridline", true)
+								.call(yGridlines)
+								.attr("transform", "translate(0,0)")
+							chart.append("g")
+								.classed("gridline", true)
+								.call(xGridlines)
+								.attr("transform", "translate(0," + height + ")")
+
+							//console.log(height)	
+							//console.log(data)
+
+							// the x axis
+							chart.append("g")
+								.classed("x axis", true)
+								.attr("transform", "translate(0," + height + ")")
+								.call(xAxis)
+									.selectAll("text")
+										.classed("x-axis-label", true)
+										.style("text-anchor", "end")
+										.style("font-size", '14px')
+										.attr("dx", 16)
+										.attr("dy", 8)
+										.attr("transform", "translate(0,0) ");
+							//This is the y axis
+							chart.append("g")
+								.classed("y axis", true)
+								.attr("transform", "translate(0,0)")
+								.call(yAxis)
+
+							//This is the x label
+							chart.select(".x.axis")
+								.append("text")
+								.attr("x", 0)
+								.attr("y", 0)
+								.style("text-anchor", "middle")
+								.style("font-size", '14px')
+								.attr("transform", "translate(" + width/2 + ",60)")
+								.text("Year");
+
+							//This is the y label
+							chart.select(".y.axis")
+								.append("text")
+								.attr("x", 0)
+								.attr("y", 0)
+								.style("text-anchor", "middle")
+								.style("font-size", '14px')
+								.attr("transform", "translate(-60," + height/2 + ") rotate(-90)")
+								.text(categories[index].value);
+
+							chart.selectAll(".trendline")
+								.data([data])
+								.enter()
+									.append("path")
+									.classed("trendline", true);
+
+							chart.append("text")
+									.attr("x", (width / 2))
+									.attr("y", 0 - (margin.top / 2))
+									.attr("text-anchor", "middle")
+									.style("font-size", "14px")
+									.style("text-decoration", "underline")
+									.text(categories[index].value);
+
+							//console.log(data)		
+							//update
+							var line = d3.svg.line()
+										.x(function(d){
+											var date = dateParser(d[0]);
+											//console.log(x(date));
+											return x(date);
+										})
+										.y(function(d){
+											return axis_List[index](d[1]);
+										})
+										.interpolate("basis");
+
+							chart.selectAll(".trendline")
+								.transition()
+								.attr("d", function(d){
+									return line(d);
+								})
+
+							//exit()
+							chart.selectAll(".trendline")
+								.data([data])
+								.exit()
+								.remove();
+
+							if (redraw === true){
+
+								chart.selectAll('text').remove()
+								chart.selectAll(".gridline").remove()
+								chart.selectAll(".tick").remove()
+
+								chart.append("g")
+									.classed("gridline", true)
+									.call(yGridlines)
+									.attr("transform", "translate(0,0)")
+								chart.append("g")
+									.classed("gridline", true)
+									.call(xGridlines)
+									.attr("transform", "translate(0," + height + ")")
+
+								
+								// the x axis
+								chart.append("g")
+									.classed("x axis", true)
+									.attr("transform", "translate(0," + height + ")")
+									.call(xAxis)
+										.selectAll("text")
+											.classed("x-axis-label", true)
+											.style("text-anchor", "end")
+											.style("font-size", '14px')
+											.attr("dx", 16)
+											.attr("dy", 8)
+											.attr("transform", "translate(0,0)");
+								//This is the y axis
+								chart.append("g")
+									.classed("y axis", true)
+									.attr("transform", "translate(0,0)")
+									.call(yAxis)
+
+								//This is the x label
+								chart.select(".x.axis")
+									.append("text")
+									.attr("x", 0)
+									.attr("y", 0)
+									.style("text-anchor", "middle")
+									.style("font-size", '14px')
+									.attr("transform", "translate(" + width/2 + ",60)")
+									.text("Year");
+
+								//This is the y label
+								chart.select(".y.axis")
+									.append("text")
+									.attr("x", 0)
+									.attr("y", 0)
+									.style("text-anchor", "middle")
+									.style("font-size", '14px')
+									.attr("transform", "translate(-60," + height/2 + ") rotate(-90)")
+									.text(categories[index].value);
+
+								chart.append("text")
+									.attr("x", (width / 2))
+									.attr("y", 0 - (margin.top / 2))
+									.attr("text-anchor", "middle")
+									.style("font-size", "14px")
+									.style("text-decoration", "underline")
+									.text(categories[index].value);
+
+								//console.log("Redraw")
+							}
+
+						}
+						// Initial Draw
+						document.getElementById('blank').click()
+					</script>
+					<ul class="actions">
+						<li><a href="#two" class="button scrolly">Trends</a></li>
+					</ul>
+				</div>
+
+			</section>
+
+			<!-- Two -->
+			<section id="two" class="wrapper style2 spotlights">
+			<div class="inner">
+				<h4> Trends for Different Time Frames </h4>
+				<div id="trendButtons">
+				</div>
+				<script>
+					
+					var trendAll = d3.select("#trendButtons")
+					  .append("button")
+						.attr("class", "button")
+						.attr("type", "button")
+						.attr("value", "All Data")
+						.attr("id", "all")
+						.style("font-size", "8")
+						.text("All Data")
+						.on("click", function(d){
+							trendplot(certified,   trendData00, x1, Certified_y_fixed)
+							trendplot(denied,   trendData01, x1, Denied_y_fixed)
+							trendplot(withdrawn, trendData02, x1, wd_y_fixed)
+							});
+						
+					var trend2012 = d3.select("#trendButtons")
+					  .append("button")
+						.attr("class", "button")
+						.attr("type", "button")
+						.attr("value", "2012")
+						.attr("id", "all")
+						.style("font-size", "8")
+						.text("2012-2014")
+						.on("click", function(d){
+							trendplot(certified,   trendData10, x1, Certified_y_fixed)
+							trendplot(denied,   trendData11, x1, Denied_y_fixed)
+							trendplot(withdrawn, trendData12, x1, wd_y_fixed)
+							});
+					var trend2014 = d3.select("#trendButtons")
+					  .append("button")
+						.attr("class", "button")
+						.attr("type", "button")
+						.attr("value", "2014")
+						.attr("id", "all")
+						.style("font-size", "8")
+						.text("2014-2016")
+						.on("click", function(d){
+							trendplot(certified,   trendData20, x1, Certified_y_fixed)
+							trendplot(denied,   trendData21, x1, Denied_y_fixed)
+							trendplot(withdrawn, trendData22, x1, wd_y_fixed)
+							});
+					var trendClear = d3.select("#trendButtons")
+					  .append("button")
+						.attr("class", "button")
+						.attr("type", "button")
+						.attr("value", "clear")
+						.attr("id", "all")
+						.style("font-size", "8")
+						.text("Clear Trend")
+						.on("click", function(d){ clearTrends(certified)
+												clearTrends(denied)
+												clearTrends(withdrawn)
+						});
+				</script>
+			</div>
+				<section id="onea">
+					<div id="onea_chart" class="small_chart">
+
+					<script>
+						// returns slope, intercept and r-square of the line
+						// from: http://bl.ocks.org/benvandyke/8459843
+
+						function leastSquares(xSeries, ySeries, marker) {
+							//console.log(marker, xSeries.length, ySeries.length)
+							var reduceSumFunc = function(prev, cur) { return prev + cur; };
+
+							var xBar = xSeries.reduce(reduceSumFunc) * 1.0 / xSeries.length;
+							var yBar = ySeries.reduce(reduceSumFunc) * 1.0 / ySeries.length;
+
+							var ssXX = xSeries.map(function(d) { return Math.pow(d - xBar, 2); })
+								.reduce(reduceSumFunc);
+
+							var ssYY = ySeries.map(function(d) { return Math.pow(d - yBar, 2); })
+								.reduce(reduceSumFunc);
+
+							var ssXY = xSeries.map(function(d, i) { return (d - xBar) * (ySeries[i] - yBar); })
+								.reduce(reduceSumFunc);
+
+							var slope = ssXY / ssXX;
+							var intercept = yBar - (xBar * slope);
+							var rSquare = Math.pow(ssXY, 2) / (ssXX * ssYY);
+
+							return [slope, intercept, rSquare, marker];
+						}
+
+						var xLabels = data.map(function (d) { return d['date']; });
+
+						var xSeriesAll  = d3.range(0, 56);
+						/*var xSeries2012 = d3.range(0, 53);*/
+						var xSeries2012 = d3.range(0, 16);
+						var xSeries2014 = d3.range(0, 35);
+
+						var ySeries00 = data.map(function(d,i) { return d.Certified; });
+						var ySeries10 = data.map(function(d,i) { return d.Denied; });
+						var ySeries20 = data.map(function(d,i) { return d.Withdrawn; });
+
+						var ySeries01 = []
+						for (var i = 0; i < data.length - 36; i++){
+							if (i > 3 ){ySeries01.push(data[i].Certified)};
+							}
+						//console.log(ySeries01)	
+
+
+						var ySeries11 = []
+						for (var i = 0; i < data.length - 36; i++){
+							if (i > 3 ){ySeries11.push(data[i].Denied)};
+							}
+						var ySeries21 = []
+						for (var i = 0; i < data.length - 36; i++){
+							if (i > 3){ySeries21.push(data[i].Withdrawn)};
+							}
+
+
+						var ySeries02 = []
+						for (var i = 0; i < data.length; i++){
+							if (i > 21 ){ySeries02.push(data[i].Certified)};
+							}
+						var ySeries12 = []
+						for (var i = 0; i < data.length; i++){
+							if (i > 21 ){ySeries12.push(data[i].Denied)};
+							}
+						var ySeries22 = []
+						for (var i = 0; i < data.length; i++){
+							if (i > 21 ){ySeries22.push(data[i].Withdrawn)};
+							}
+
+
+						var leSqCf00 = leastSquares(xSeriesAll,  ySeries00, '00');
+						var leSqCf10 = leastSquares(xSeries2012, ySeries01, '01');
+						var leSqCf20 = leastSquares(xSeries2014, ySeries02, '02');
+						var leSqCf01 = leastSquares(xSeriesAll,  ySeries10, '10');
+						var leSqCf11 = leastSquares(xSeries2012, ySeries11, '11');
+						var leSqCf21 = leastSquares(xSeries2014, ySeries12, '12');
+						var leSqCf02 = leastSquares(xSeriesAll,  ySeries20, '20');
+						var leSqCf12 = leastSquares(xSeries2012, ySeries21, '21');
+						var leSqCf22 = leastSquares(xSeries2014, ySeries22, '22');
+
+						//console.log(leSqCf10);
+
+						function getTrendData(xSeries, leastSquaresCoeff, index1, index2){
+								//console.log(leastSquaresCoeff, index)
+								var x1 = xLabels[index1];
+								var y1 = leastSquaresCoeff[0] + leastSquaresCoeff[1];
+								var x2 = xLabels[index2];
+								var y2 = leastSquaresCoeff[0] * xSeries.length + leastSquaresCoeff[1];
+								var trendData = [[x1,y1,x2,y2,leastSquaresCoeff[2],leastSquaresCoeff[3] ]];
+								//console.log(leastSquaresCoeff)
+								return trendData
+						}
+						var trendData00 = getTrendData(xSeriesAll, leSqCf00,0, 56)
+						var trendData10 = getTrendData(xSeries2012, leSqCf10,3, 21)
+						var trendData20 = getTrendData(xSeries2014, leSqCf20,21, 56)
+						var trendData01 = getTrendData(xSeriesAll, leSqCf01,0, 56)
+						var trendData11 = getTrendData(xSeries2012, leSqCf11,3, 21)
+						var trendData21 = getTrendData(xSeries2014, leSqCf21,21, 56)
+						var trendData02 = getTrendData(xSeriesAll, leSqCf02,0, 56)
+						var trendData12 = getTrendData(xSeries2012, leSqCf12,3, 21)
+						var trendData22 = getTrendData(xSeries2014, leSqCf22,21, 56)
+
+						//console.log(trendData10)
+
+						var margin1 = {top: 50,bottom: 80,left:80,right: 10};
+						var w1 = 800;
+						var h1 = 400;
+						var width1 = w1 - margin1.left - margin1.right;
+						var height1 = h1 - margin1.top - margin1.bottom;
+						var Certified_y_fixed = d3.scale.linear()
+							.domain([1367, 10812])
+							.range([height1,0]);
+						var Denied_y_fixed = d3.scale.linear()
+							.domain([123, 622])
+							.range([height1,0]);
+						var wd_y_fixed = d3.scale.linear()
+							.domain([137, 413])
+							.range([height1,0]);
+
+						var x1 = d3.time.scale()
+							.domain(d3.extent(data, function(d){
+								var date = dateParser(d.date);
+								return date;
+							}))
+							.range([0,width1]);
+						
+						var y01 = d3.scale.linear()
+							.domain([d3.min(data, function(d){return d.Certified - 5;}), d3.max(data, function(d){return d.Certified + 5;
+							})])
+							.range([height1,0]);
+						
+						var y11 = d3.scale.linear()
+							.domain([d3.min(data, function(d){return d.Denied - 1;}), d3.max(data, function(d){return d.Denied + 1;
+							})])
+							.range([height1,0]);
+						var y21 = d3.scale.linear()
+							.domain([d3.min(data, function(d){return d.Withdrawn - 1;}), d3.max(data, function(d){return d.Withdrawn + 1;
+							})])
+							.range([height1,0]);
+
+
+
+						var axis_List = [y01,y11,y21];
+						var svg1 = d3.select("#onea_chart")
+								.append("svg")
+									.attr("id", "onea_chart")
+									.attr("width", w1)
+									.attr("height", h1);
+
+						var line_chart1 = svg1.append("g")
+									.classed("chart", true)
+									.attr("id", "certified")
+									.attr("transform", "translate(" + margin1.left + "," + margin1.top + ")");
+
+
+
+						function trendplot (chart, trendData, xScale, yScale){
+							//console.log(chart)
+							d3.select(chart).select(".regtrendline").remove();
+
+							var regtrend = d3.select(chart)
+								.selectAll("regtrendline")
+								.data(trendData);
+
+							//console.log(trendData);
+
+							regtrend.enter()
+								.append("line")
+								.attr("class", "regtrendline")
+								.attr("x1", function(d) { return xScale(dateParser(d[0])); })
+								.attr("y1", function(d) { return yScale(d[1]); })
+								.attr("x2", function(d) { return xScale(dateParser(d[2])); })
+								.attr("y2", function(d) { return yScale(d[3]); })
+								.attr("text",function(d){ return d[4];})
+								.attr("stroke", "black")
+								.attr("stroke-width", 3)
+
+						}
+						function clearTrends (chart){
+							//console.log(chart)
+							d3.select(chart).select(".regtrendline").remove();
+							}
+
+						function plot_small(params, chart, index, redraw){
+							var data = []
+							//console.log(axis_List)
+							var key = categories[index].key
+							//console.log(key)
+
+							params.forEach(function(element){
+								//console.log(element["date"], element[key])
+								data.push([element["date"], element[key]])
+							})
+							//console.log(data)
+
+							var axis_List = [y01, y11,y21];
+							var color_List = []
+							var x1Axis = d3.svg.axis()
+										.scale(x1)
+										.orient("bottom")
+										.ticks(d3.time.months,24)
+										.tickFormat(d3.time.format("%Y"));
+							var y1Axis = d3.svg.axis()
+										.scale(axis_List[index])
+										.orient("left")
+										.ticks(15);
+							var y1Gridlines = d3.svg.axis()
+											.scale(axis_List[index])
+											.tickSize(-width,0,0)
+											.tickFormat("")
+											.ticks(15)
+											.orient("left");
+							var x1Gridlines = d3.svg.axis()
+											.scale(x1)
+											.tickSize(-height1,0,0)
+											.tickFormat("")
+											.ticks(d3.time.months,24);
+
+							//gridlines
+							chart.append("g")
+								.classed("gridline1", true)
+								.call(y1Gridlines)
+								.attr("transform", "translate(0,0)")
+							chart.append("g")
+								.classed("gridline1", true)
+								.call(x1Gridlines)
+								.attr("transform", "translate(0," + height + ")")
+
+							// the x axis
+							chart.append("g")
+								.classed("x axis", true)
+								.attr("transform", "translate(0," + height1 + ")")
+								.call(x1Axis)
+									.selectAll("text")
+										.classed("x-axis-label", true)
+										.style("text-anchor", "end")
+										.style("fill", "#FFFFFF")
+										.attr("dx", 16)
+										.attr("dy", 8)
+										.attr("transform", "translate(0,0) ");
+							//This is the y axis
+							chart.append("g")
+								.classed("y axis", true)
+								.attr("transform", "translate(0,0)")
+								.call(y1Axis)
+
+							//This is the x label
+							chart.select(".x.axis")
+								.append("text")
+								.attr("x", 0)
+								.attr("y", 0)
+								.style("text-anchor", "middle")
+								.attr("transform", "translate(" + width1/2 + ",60)")
+								.text("Year")
+								.style("fill", "#FFFFFF");
+
+							//This is the y label
+							chart.select(".y.axis")
+								.append("text")
+								.attr("x", 0)
+								.attr("y", 0)
+								.style("text-anchor", "middle")
+								.style("fill", "#FFFFFF")
+								.attr("transform", "translate(-10," + height1/2 + ") rotate(-90)")
+								.text(categories[index].value);
+							//console.log(data)
+
+							chart.selectAll(".point")
+								.data(data)
+								.enter()
+									.append("circle")
+									.classed("point", true)
+									.attr("r", 4);
+
+							chart.selectAll(".point")
+								.attr("cx", function(d){
+									var date = dateParser(d[0]);
+									return x1(date);
+								})
+								.attr("cy", function(d){
+									return axis_List[index](d[1]);
+								})
+
+
+							//update
+							var line1 = d3.svg.line()
+										.x(function(d){
+											var date = dateParser(d[0]);
+											return x1(date);
+										})
+										.y(function(d){
+											return axis_List[index](d[1]);
+										})
+
+
+							chart.selectAll('text').remove()
+							chart.selectAll(".gridline1").remove()
+							chart.selectAll(".tick").remove()
+
+							chart.append("g")
+								.classed("gridline1", true)
+								.call(y1Gridlines)
+								.attr("transform", "translate(0,0)")
+							chart.append("g")
+								.classed("gridline1", true)
+								.call(x1Gridlines)
+								.attr("transform", "translate(0," + height1 + ")")
+
+							// the x axis
+							chart.append("g")
+								.classed("x axis", true)
+								.attr("transform", "translate(0," + height1 + ")")
+								.call(x1Axis)
+									.selectAll("text")
+										.classed("x-axis-label", true)
+										.style("text-anchor", "end")
+										.style("font-size", "10px")
+										.style("fill", "#FFFFFF")
+										.attr("dx", 16)
+										.attr("dy", 8)
+										.attr("transform", "translate(0,0) ");
+							//This is the y axis
+							chart.append("g")
+								.classed("y axis", true)
+								.attr("transform", "translate(0,0)")
+								.style("font-size", "10px")
+								.style("fill", "#FFFFFF")
+								.call(y1Axis)
+
+							//This is the x label
+							chart.select(".x.axis")
+								.append("text")
+								.attr("x", 0)
+								.attr("y", 0)
+								.style("text-anchor", "middle")
+								.style("font-size", "12px")
+								.style("fill", "#FFFFFF")
+								.attr("transform", "translate(" + width1/2 + ",60)")
+								.text("Year");
+
+							//This is the y label
+							chart.select(".y.axis")
+								.append("text")
+								.attr("x", 0)
+								.attr("y", 0)
+								.style("text-anchor", "middle")
+								.style("font-size", "12px")
+								.style("fill", "#FFFFFF")
+								.attr("transform", "translate(-40," + height1/2 + ") rotate(-90)")
+								.text(categories[index].value);
+
+
+							chart.selectAll(".trendline1")
+								.data([data])
+								.enter()
+									.append("path")
+									.classed("trendline1", true)
+
+							chart.selectAll(".trendline1")
+								.attr("d", function(d){
+									return line1(d);
+								})
+							//exit()
+							chart.selectAll(".trendline1")
+								.data([data])
+								.exit()
+								.remove();
+							chart.selectAll(".point")
+								.data(data)
+								.exit()
+								.remove();
+							//}
+
+						}
+						plot_small(data, line_chart1, "0", true)
+						//console.log(categories)
+					</script>
+				</div>
+				<div class="content">
+						<div class="inner">
+
+							<h3>Status - Certified (incl. Certified-Expired) </h3>
+							<p>This timeline shows the Status - Certified from 2012 to 2016.
+								We can see for overall certified applications, the number increases significantly since 2012. However, the number of the certified applications dropped dramatically in 2013.</p>
+						</div>
+					</div>
+				</section>
+				<section id="oneb">
+					<div id="oneb_chart"></div>
+					<script>
+						var svg2 = d3.select("#oneb_chart")
+								.append("svg")
+									.attr("id", "oneb_chart")
+									.attr("width", w1)
+									.attr("height", h1);
+						var line_chart2 = svg2.append("g")
+									.classed("chart", true)
+									.attr("id", "denied")
+									.attr("transform", "translate(" + margin1.left + "," + margin1.top + ")");
+						plot_small(data, line_chart2, "1", true)
+					</script>
+					<div class="content">
+						<div class="inner">
+							<h3>Status - Denied</h3>
+							<p>From 2012 to 2016, we see a slightly decline in the yearly number of denied applications. </p>
+						</div>
+					</div>
+				</section>
+				<section id="onec">
+					<div id="onec_chart"></div>
+					<script>
+						var svg3 = d3.select("#onec_chart")
+								.append("svg")
+									.attr("id", "onec_chart")
+									.attr("width", w1)
+									.attr("height", h1);
+						var line_chart3 = svg3.append("g")
+									.classed("chart", true)
+									.attr("id", "withdrawn")
+									.attr("transform", "translate(" + margin1.left + "," + margin1.top + ")");
+						plot_small(data, line_chart3, "2", true)
+					</script>
+					<div class="content">
+						<div class="inner">
+							<h3>Status - Withdrawn</h3>
+							<p> Here you can see withdrawn applications have a slightly increase from 2012 to 2013. </p>
+						</div>
+					</div>
+				</section>
+
+			</section>
+
+			<!-- Three -->
+			<section id="three" class="wrapper style1 fade-up">
+				<div class="inner">
+					<h2>Case Status by Foreign Worker Education from 2012 to 2016</h2>
+					<p>This graph shows the proportion of different case status out of the total decisions over the past few years for different education level. 
+						We can find out the denied rates of high school and associate are higher than higher degrees.
+					</p>
+
+					<div class="features" id="chart2_container">
+					<script>
+
+						var margin = {top: 20, right: 160, bottom: 35, left: 30};
+
+						var width2 = 960 - margin.left - margin.right,
+							height2 = 500 - margin.top - margin.bottom;
+
+						var svg = d3.select("#chart2_container").style("background-color", "#FFFFFF")
+							.append("svg")
+							.attr("id", "bar_chart")
+							.attr("width", width2 + margin.left + margin.right + 200)
+							.attr("height", height2 + margin.top + margin.bottom)
+							.append("g")
+							.attr("transform", "translate(60 ," + margin.top + ")");
+
+						//console.log(margin.left);
+
+							
+
+						var data2 = [
+						{Education:"High School",StatusCertified:48.65,StatusCertifiedExpired:24.94,StatusDenied:20.24,StatusWithdrawn:6.16},
+						{Education:"Associate",StatusCertified:48.93,StatusCertifiedExpired:28.68,StatusDenied:17.59,StatusWithdrawn:4.79},
+						{Education:"Bachelor",StatusCertified:51.19,StatusCertifiedExpired:41.40,StatusDenied:3.98,StatusWithdrawn:3.44},					
+						{Education:"Master",StatusCertified:51.28,StatusCertifiedExpired:41.14,StatusDenied:3.94,StatusWithdrawn:3.64},
+						{Education:"Doctorate",StatusCertified:48.72,StatusCertifiedExpired:44.51,StatusDenied:2.82,StatusWithdrawn:3.95},
+						{Education:"Other",StatusCertified:48.38,StatusCertifiedExpired:41.18,StatusDenied:6.16,StatusWithdrawn:4.28}
+						];
+
+						//console.log(data);
+
+
+						// Transpose the data into layers
+						var dataset = d3.layout.stack()(["StatusCertified", "StatusCertifiedExpired", "StatusDenied", "StatusWithdrawn"].map(function(appstatus) {
+						  return data2.map(function(d) {
+						    return {x: d.Education, y: +d[appstatus]};
+						  });
+						}));
+
+						console.log(dataset);
+
+						// Set x, y and colors
+    					var x3 = d3.scale.ordinal()
+							.domain(dataset[0].map(function(d) { return d.x; }))
+							.rangeRoundBands([20, width2-20], 0.2);
+						//console.log(width);
+
+
+						var y3 = d3.scale.linear()
+							.domain([0, d3.max(dataset, function(d) { return d3.max(d, function(d) { return d.y0 + d.y; });  })])
+  						.range([height2, 0]);
+						//console.log(height2);
+
+						var colors = ["#59A14F",  "#EDC948", "#E15759",  "#76B7B2"];
+
+
+						// Define and draw axes
+						var yAxis = d3.svg.axis()
+							.scale(y3)
+						  	.orient("left")
+						  	.ticks(5)
+						  	.tickSize(-width2, 0, 0)
+						  	.tickFormat( function(d) { return d } );
+						
+						//console.log(yAxis);
+
+						var xAxis = d3.svg.axis()
+							.scale(x3)
+						    .orient("bottom");
+
+						//console.log(xAxis);
+
+						svg.append("g")
+						  	.attr("class", "y axis")
+						  	.call(yAxis)
+						  	.append("text")
+							.attr("x", 2)
+							.attr("y", y3(y3.ticks().pop()) + 0.5)
+      						.attr("dy", "0.32em")
+							.style("text-anchor", "middle")
+							.style("font-size", '14px')
+							.attr("transform", "translate(-35," + height2/2 + ") rotate(-90)")
+							.text("% of Total Number of Records"); 
+
+						svg.append("g")
+						  	.attr("class", "x axis")
+						  	.attr("transform", "translate(0," + height2 + ")")
+						  	.call(xAxis);
+
+
+						// Create groups for each series, rects for each segment
+						var groups = svg.selectAll("g.cost")
+						  	.data(dataset)
+						  	.enter().append("g")
+						  	.attr("class", "cost")
+						  	.style("fill", function(d, i) { return colors[i]; });
+
+						var rect = groups.selectAll("rect")
+						  	.data(function(d) { return d; })
+						  	.enter()
+						  	.append("rect")
+						  	.attr("x", function(d) { return x3(d.x); })
+						  	.attr("y", function(d) { return y3(d.y0 + d.y); })
+						  	.attr("height", function(d) { return y3(d.y0) - y3(d.y0 + d.y); })
+						  	.attr("width", x3.rangeBand())
+						  	.on("mouseover", function() { tooltip.style("display", null); })
+						  	.on("mouseout", function() { tooltip.style("display", "none"); })
+						  	.on("mousemove", function(d) {
+							    var xPosition = d3.mouse(this)[0] - 15;
+							    var yPosition = d3.mouse(this)[1] - 25;
+							    tooltip.attr("transform", "translate(" + xPosition + "," + yPosition + ")");
+							    tooltip.select("text").text(d.y);
+						  });
+
+
+						// Draw legend
+						var legend = svg.selectAll(".legend")
+						  .data(colors)
+						  .enter().append("g")
+						  .attr("class", "legend")
+						  .attr("transform", function(d, i) { return "translate(30," + i * 19 + ")"; });
+
+						legend.append("rect")
+						  .attr("x", width2 - 18)
+						  .attr("width", 18)
+						  .attr("height", 18)
+						  .style("fill", function(d, i) {return colors.slice().reverse()[i];});
+
+						legend.append("text")
+						  .attr("x", width2 + 5)
+						  .attr("y", 9)
+						  .attr("dy", ".35em")
+						  .style("text-anchor", "start")
+						  .text(function(d, i) {
+						    switch (i) {
+						      case 0: return "Status - Certified";
+						      case 1: return "Status - Certified Expired";
+						      case 2: return "Status - Denied";
+						      case 3: return "Status - Withdrawn";
+						    }
+						  });
+
+
+						// Prep the tooltip bits, initial display is hidden
+						var tooltip = svg.append("g")
+						  .attr("class", "tooltip")
+						  .style("display", "none");
+
+						tooltip.append("rect")
+						  .attr("width", 30)
+						  .attr("height", 20)
+						  .attr("fill", "white")
+						  .style("opacity", 0.5);
+
+						tooltip.append("text")
+						  .attr("x", 15)
+						  .attr("dy", "1.2em")
+						  .style("text-anchor", "middle")
+						  .attr("font-size", "12px")
+						  .attr("font-weight", "bold");
+
+
+
+					</script>
+					</div>
+					<ul class="actions">
+						<li><a href="#intro" class="button scrolly">Home</a></li>
+					</ul>
+					</div>
+
+				</section>
+
+		</div>
+
+	<!-- Scripts -->
+		<script src="assets/js/jquery.min.js"></script>
+		
+		<script src="assets/js/jquery.scrollex.min.js"></script>
+		<script src="assets/js/jquery.scrolly.min.js"></script>
+		<script src="assets/js/skel.min.js"></script>
+		<script src="assets/js/util.js"></script>
+		<!--[if lte IE 8]><script src="assets/js/ie/respond.min.js"></script><![endif]-->
+		<script src="assets/js/main.js"></script>
+
+	</body>
+</html>
